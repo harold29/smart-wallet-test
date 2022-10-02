@@ -1,0 +1,40 @@
+
+services:
+  smart-wallet:
+    depends_on:
+      - smart_wallet_db
+    build:
+      context: .
+    container_name: smart-wallet-rest
+    hostname: smart-wallet-rest
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-wallet_test}
+      - POSTGRES_USER=${POSTGRES_USER:-wallet_test}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?database password not set}
+    networks:
+      - smart-wallet-network
+    ports:
+      - 80:8080
+    deploy:
+      restart_policy:
+        condition: on-failure
+  smart_wallet_db:
+    image: postgres:latest
+    container_name: smart_wallet_pg_1
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_1:-wallet_test}
+      POSTGRES_USER: ${POSTGRES_USER:-wallet_test}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD:-12345}
+    networks:
+      - smart-wallet-network
+    ports:
+      - 5432:5432
+    volumes:
+      - smart_wallet_db:/var/lib/postgresql/data
+
+volumes:
+  smart_wallet_db:
+
+networks:
+  smart-wallet-network:
+    driver: bridge
