@@ -1,0 +1,13 @@
+DB:
+  PG_HOST: xxxx
+  PG_HOST_REPLICA: xxxx
+  PG_USER: xxxx
+  PG_DB: xxxx
+  PG_PORT: xxxx
+  PG_PORT_REPLICA: xxxx
+  PG_PASS: xxxx
+  PG_CONN_MAX_IDLE_TIME: xxxx
+  PG_CONN_MAX_LIFE_TIME: xxxx
+  PG_MAX_IDLE_CONN: 2
+  PG_MAX_OPEN_CONN: 2
+  
