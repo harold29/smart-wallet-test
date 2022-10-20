@@ -2,11 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-	"smart_wallet/pkg/common/config"
-	"smart_wallet/pkg/common/db"
+	"net/url"
+	"time"
 
+	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
+	"github.com/auth0/go-jwt-middleware/v2/jwks"
+	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/gin-gonic/gin"
+	adapter "github.com/gwatts/gin-adapter"
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -16,16 +22,43 @@ func main() {
 
 	viper.SetConfigFile("./pkg/common/envs/dev.yaml")
 
-	conf, err := config.LoadConfig()
+	// conf, err := config.LoadConfig()
+
+	// if err != nil {
+	// 	fmt.Printf("Error loading configuration, %s", err)
+	// 	return
+	// }
+
+	// dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", conf.Db.PostgresHost, conf.Db.PostgresUser, conf.Db.PostgresPass, conf.Db.PostgresDB, conf.Db.PostgresPort)
+
+	// potato := db.Init(dbInfo)
+	var envs map[string]string
+	envs, err := godotenv.Read(".env")
 
 	if err != nil {
-		fmt.Printf("Error loading configuration, %s", err)
-		return
+		log.Fatal("Error loading .env file")
 	}
 
-	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", conf.Db.PostgresHost, conf.Db.PostgresUser, conf.Db.PostgresPass, conf.Db.PostgresDB, conf.Db.PostgresPort)
+	// issuerURL, _ := url.Parse(os.Getenv("AUTH0_ISSUER_URL"))
+	// audience := os.Getenv("AUTH0_AUDIENCE")
+	issuerURL, _ := url.Parse(envs["AUTH0_ISSUER_URL"])
+	audience := envs["AUTH0_AUDIENCE"]
 
-	potato := db.Init(dbInfo)
+	fmt.Printf("POTATO")
+	fmt.Printf(envs["AUTH0_ISSUER_URL"])
+	fmt.Printf(audience)
+
+	provider := jwks.NewCachingProvider(issuerURL, time.Duration(5*time.Minute))
+
+	jwtValidator, _ := validator.New(provider.KeyFunc,
+		validator.RS256,
+		issuerURL.String(),
+		[]string{audience},
+	)
+
+	jwtMiddleware := jwtmiddleware.New(jwtValidator.ValidateToken)
+	router.Use(adapter.Wrap(jwtMiddleware.CheckJWT))
+	// checkJwt := adapter.Wrap(jwtMiddleware.CheckJWT)
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "OK"})
