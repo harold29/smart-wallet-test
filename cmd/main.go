@@ -39,8 +39,6 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	// issuerURL, _ := url.Parse(os.Getenv("AUTH0_ISSUER_URL"))
-	// audience := os.Getenv("AUTH0_AUDIENCE")
 	issuerURL, _ := url.Parse(envs["AUTH0_ISSUER_URL"])
 	audience := envs["AUTH0_AUDIENCE"]
 
@@ -57,10 +55,10 @@ func main() {
 	)
 
 	jwtMiddleware := jwtmiddleware.New(jwtValidator.ValidateToken)
-	router.Use(adapter.Wrap(jwtMiddleware.CheckJWT))
-	// checkJwt := adapter.Wrap(jwtMiddleware.CheckJWT)
+	// router.Use(adapter.Wrap(jwtMiddleware.CheckJWT))
+	checkJwt := adapter.Wrap(jwtMiddleware.CheckJWT)
 
-	router.GET("/ping", func(c *gin.Context) {
+	router.GET("/ping", checkJwt, func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "OK"})
 	})
 
