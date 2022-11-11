@@ -24,8 +24,12 @@ type Config struct {
 	Db DBConfig `mapstructure:"DB"`
 }
 
-func LoadConfig() (c Config, e error) {
-	viper.AddConfigPath("pkg/common/envs")
+func LoadConfig(ConfigPath string) (c Config, e error) {
+	if ConfigPath == "" {
+		viper.AddConfigPath("pkg/common/envs")
+	} else {
+		viper.AddConfigPath(ConfigPath)
+	}
 	viper.SetConfigName("dev")
 	viper.SetConfigType("yaml")
 

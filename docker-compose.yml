@@ -29,6 +29,8 @@ services:
       - smart-wallet-network
     ports:
       - 5432:5432
+    expose:
+      - "5432"
     volumes:
       - smart_wallet_db:/var/lib/postgresql/data
 

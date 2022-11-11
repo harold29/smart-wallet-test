@@ -1,11 +1,14 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	uuid "github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Geolocation struct {
 	gorm.Model
-	ID         string `sql:"type:uuid;primary_key;default:uuid_generate_v4()"`
-	Latitude   string
-	Longitude  string
-	LocationID string
+	ID         uuid.UUID `gorm:"primaryKey; unique; type:uuid; column:id; default:uuid_generate_v4()"`
+	Latitude   string    `gorm:"not null"`
+	Longitude  string    `gorm:"not null"`
+	LocationID string    `gorm:"not null"`
 }

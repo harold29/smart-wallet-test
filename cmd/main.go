@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"smart_wallet/pkg/common/config"
+	"smart_wallet/pkg/common/db"
+	"smart_wallet/pkg/users"
 	"time"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
@@ -22,16 +25,17 @@ func main() {
 
 	viper.SetConfigFile("./pkg/common/envs/dev.yaml")
 
-	// conf, err := config.LoadConfig()
+	conf, errConf := config.LoadConfig("")
 
-	// if err != nil {
-	// 	fmt.Printf("Error loading configuration, %s", err)
-	// 	return
-	// }
+	if errConf != nil {
+		fmt.Printf("Error loading configuration, %s", errConf)
+		return
+	}
 
-	// dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", conf.Db.PostgresHost, conf.Db.PostgresUser, conf.Db.PostgresPass, conf.Db.PostgresDB, conf.Db.PostgresPort)
+	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", conf.Db.PostgresHost, conf.Db.PostgresUser, conf.Db.PostgresPass, conf.Db.PostgresDB, conf.Db.PostgresPort)
 
-	// potato := db.Init(dbInfo)
+	db := db.Init(dbInfo)
+
 	var envs map[string]string
 	envs, err := godotenv.Read(".env")
 
@@ -41,10 +45,6 @@ func main() {
 
 	issuerURL, _ := url.Parse(envs["AUTH0_ISSUER_URL"])
 	audience := envs["AUTH0_AUDIENCE"]
-
-	fmt.Printf("POTATO")
-	fmt.Printf(envs["AUTH0_ISSUER_URL"])
-	fmt.Printf(audience)
 
 	provider := jwks.NewCachingProvider(issuerURL, time.Duration(5*time.Minute))
 
@@ -61,6 +61,8 @@ func main() {
 	router.GET("/ping", checkJwt, func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "OK"})
 	})
+
+	users.RegisterRoutes(router, db)
 
 	router.Run(":8080")
 }
