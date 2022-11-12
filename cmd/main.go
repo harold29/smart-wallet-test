@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+	"harold29/yourkeyswallet/pkg/common/config"
+	"harold29/yourkeyswallet/pkg/common/db"
+	"harold29/yourkeyswallet/pkg/users"
 	"log"
 	"net/http"
 	"net/url"
-	"smart_wallet/pkg/common/config"
-	"smart_wallet/pkg/common/db"
-	"smart_wallet/pkg/users"
 	"time"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"

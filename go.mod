@@ -1,4 +1,4 @@
-module smart_wallet
+module harold29/yourkeyswallet
 
 go 1.18
 
