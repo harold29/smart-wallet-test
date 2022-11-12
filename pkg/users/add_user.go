@@ -1,8 +1,8 @@
 package users
 
 import (
+	"harold29/yourkeyswallet/pkg/common/models"
 	"net/http"
-	"smart_wallet/pkg/common/models"
 	"time"
 
 	"github.com/gin-gonic/gin"

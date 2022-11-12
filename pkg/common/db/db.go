@@ -1,8 +1,8 @@
 package db
 
 import (
+	"harold29/yourkeyswallet/pkg/common/models"
 	"log"
-	"smart_wallet/pkg/common/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
